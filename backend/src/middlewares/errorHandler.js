@@ -1,4 +1,5 @@
-const { validationResult } = require('express-validator');
+import { validationResult } from 'express-validator';
+import { CustomError } from '../utils/error.util.js';
 
 function errorHandler(err, req, res, next) {
   // Validaciones de express-validator
@@ -11,20 +12,23 @@ function errorHandler(err, req, res, next) {
   }
 
   // Errores personalizados
-  if (err && err.status) {
+  if (err instanceof CustomError) {
+    // Log para desarrollador
+    if (err.devMessage) {
+      console.error('[DEV]', err.devMessage, err.details || '');
+    }
     return res.status(err.status).json({
       success: false,
       message: err.message || 'Error',
-      details: err.details || undefined
     });
   }
 
   // Errores no controlados
-  console.error(err);
+  console.error('[SERVER ERROR]', err);
   res.status(500).json({
     success: false,
-    message: 'Internal Server Error'
+    message: 'Error interno del servidor'
   });
 }
 
-module.exports = errorHandler;
+export default errorHandler;
