@@ -26,6 +26,24 @@ class UserController {
     }
   }
 
+  async getMe(req, res, next) {
+    try {
+      const { email, name, role } = req.user || {};
+      if (!email || !name || !role) {
+        return next(throwCustomError('Token inválido o usuario no autenticado', { devMessage: 'Token inválido o usuario no autenticado', status: 401, details: req.user }));
+      }
+
+      const user = await this.model.findByFields({ email, name, role });
+      if (!user) {
+        return next(throwCustomError('Usuario no encontrado', { status: 404 }));
+      }
+      const { password: _pw, role_id: _rin, ...userData } = user;
+      res.json({ success: true, user: userData });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async logout(req, res) {
     res.clearCookie('token');
     res.json({ success: true, message: 'Cierre de sesión exitoso' });
