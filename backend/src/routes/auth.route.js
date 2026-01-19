@@ -9,6 +9,7 @@ const authRouter = ({ UserModel }) => {
   const userController = new UserController({ UserModel });
 
   router.post("/login", validate(loginSchema), userController.login.bind(userController));
+  router.get("/me", auth, userController.getMe.bind(userController));
   router.post("/logout", auth, userController.logout.bind(userController));
 
   return router;
