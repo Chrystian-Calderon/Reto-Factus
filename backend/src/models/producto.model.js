@@ -25,10 +25,10 @@ class Producto {
     const offset = (page - 1) * limit;
     const searchQuery = `%${search}%`;
     const query = `
-			SELECT id, name, barcode, description, stock_min
+			SELECT id, name, barcode, description, stock_min, created_at, deleted_at
 			FROM productos
 			WHERE name ILIKE $1 OR barcode ILIKE $1 OR description ILIKE $1
-			ORDER BY name
+			ORDER BY created_at DESC
 			LIMIT $2 OFFSET $3
 		`;
     const { rows } = await pool.query(query, [searchQuery, limit, offset]);
