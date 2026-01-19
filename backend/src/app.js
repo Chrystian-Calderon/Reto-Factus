@@ -23,4 +23,24 @@ app.use('/auth', authRouter({ UserModel }));
 app.use('/bodegas', bodegaRouter({ BodegaModel }));
 app.use('/productos', productoRouter({ ProductoModel }));
 
+// Manejo centralizado de errores
+app.use((err, req, res, next) => {
+  // Si es un CustomError, responde con su estructura
+  if (err && err.status && err.message) {
+    return res.status(err.status).json({
+      success: false,
+      message: err.message,
+      details: err.details || null,
+      devMessage: process.env.NODE_ENV === 'development' ? err.devMessage : undefined
+    });
+  }
+  // Otros errores
+  console.error(err);
+  res.status(500).json({
+    success: false,
+    message: 'Error interno del servidor',
+    details: null
+  });
+});
+
 export default app;
